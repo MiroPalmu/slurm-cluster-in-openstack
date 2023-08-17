@@ -3,8 +3,8 @@
 #
 # Cluster general info
 # 
-cluster_name: "cluster1"
-image_name: "rocky-8.7"
+cluster_name: "kuutti"
+image_name: "rocky-8.8-firewall-patched"
 image_init_user: "rocky"
 yum_repo_prefix:
   Rocky: "Rocky"
@@ -15,8 +15,8 @@ yum_repo_prefix:
 #
 head_node_name: "{{ cluster_name }}-headnode"
 head_node_volume: "{{ cluster_name }}-headnode-boot"
-head_node_flavor: c1.m8
-head_node_disk_size_gb: 50
+head_node_flavor: standard.large
+head_node_disk_size_gb: 100
 head_node_user_packages:
   - ohpc-autotools
   - ohpc-gnu12-io-libs
@@ -44,48 +44,46 @@ head_node_user_packages:
 mysql_user: slurm
 mysql_password: slurmdb
 # Set install_intel_oneapi to true to install Intel OneAPI (minimum head_node_disk_size_gb 60 )
-install_intel_oneapi: false
+install_intel_oneapi: true
 
 #
 # Access
 #
-keypair_name: "{{ cluster_name }}-key"
-ssh_public_keyfile: /home/user/.ssh/id_rsa.pub
-ssh_private_keyfile: /home/user/.ssh/id_rsa
-cluster_security_group: "{{ cluster_name }}-group"
+keypair_name: "openstack-csc-laptop-palmu"
+ssh_public_keyfile: /home/miropalm/.ssh/id_rsa.pub
+ssh_private_keyfile: /home/miropalm/.ssh/id_rsa
+cluster_security_group: "slurm-security-group"
 cluster_network_ssh_access: 0.0.0.0/0
 
 #
 # Networking
-#
 cluster_network_name: "{{ cluster_name }}-net"
-cluster_network_cidr: 192.168.100.0/24
-cluster_network_allocation_pool_start: 192.168.100.50
-cluster_network_allocation_pool_end: 192.168.100.249
+cluster_network_cidr: 192.168.1.0/24
+cluster_network_allocation_pool_start: 192.168.1.4
+cluster_network_allocation_pool_end: 192.168.1.254
 cluster_network_dns_servers:
-  - 128.253.180.2
-  - 192.35.82.50
-  - 132.236.56.250
+  - 193.166.4.24
+  - 193.166.4.25
 cluster_network_router: "{{ cluster_network_name }}-router"
 
 #
 # Compute imaging instance: the instance create_compute_image.yml playbook
 # uses to create compute node image.
 #
-compute_imaging_instance_flavor: c1.m8
+compute_imaging_instance_flavor: standard.large
 
 #
 # Compute Node
 #
 compute_node_image: "{{ cluster_name }}-compute-image"
-compute_node_flavor: c4.m32
+compute_node_flavor: standard.large
 # Need to match the core count of compute_node_flavor. Need to rebuild
 # compute image after changing this value
 compute_node_cpus: 4
-compute_node_disk_size_gb: 50
+compute_node_disk_size_gb: 100
 # Max number of compute nodes. Need to rebuild compute image after
 # changing this value
-max_compute_nodes: 10
+max_compute_nodes: 4
 # Number of seconds slurm waits before deleting an idle compute node
 # instance
 slurm_suspend_time: 300

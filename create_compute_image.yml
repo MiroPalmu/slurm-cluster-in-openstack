@@ -77,14 +77,15 @@
     - role: geerlingguy.ntp
       vars:
         ntp_daemon: chronyd
-        ntp_timezone: "America/New_York"
+        ntp_timezone: "Etc/UTC"
         ntp_enabled: true
         ntp_config_file: /etc/chrony.conf
         ntp_servers:
-          - "ntp0.cac.cornell.edu iburst"
-          - "ntp1.cac.cornell.edu iburst"
-          - "ntp2.cac.cornell.edu iburst"
-        ntp_cron_handler_enabled: true
+          - "0.fi.pool.ntp.org iburst"
+          - "1.fi.pool.ntp.org iburst"
+          - "2.fi.pool.ntp.org iburst"
+          - "3.fi.pool.ntp.org iburst"
+        ntp_cron_handler_enabled: false
 
   tasks:
     - import_tasks: tasks/install_compute_packages.yml
@@ -219,7 +220,7 @@
         name: "{{ compute_node_image }}"
         volume: "{{ volumes_info.volumes[0].id }}"
         disk_format: raw
-        timeout: 1200
+        timeout: 3600
         state: present
 
     - name: Delete compute image volume
