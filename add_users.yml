@@ -1,0 +1,48 @@
+---
+- hosts: localhost
+  gather_facts: false
+  vars_files: 
+    - ./vars/main.yml
+  tasks: 
+    - import_tasks: tasks/add_headnode_inventory.yml
+
+
+- hosts: headnode
+  become: true
+  vars:
+    users:
+      - palmu
+  tasks:
+    - name: Make sure we have a 'wheel' group
+      group:
+        name: wheel
+        state: present  
+
+    - name: Allow 'wheel' group to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^%wheel'
+        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+        validate: visudo -cf %s
+
+    - name: Add users
+      ansible.builtin.user:
+        user: "{{ item }}"
+        state: present
+        groups: wheel
+        create_home: true
+        generate_ssh_key: true
+      loop: "{{ users }}"
+
+    - name: Add authorized keys to users
+      ansible.posix.authorized_key:
+        user: "{{ item }}"
+        state: present
+        exclusive: true
+        key: "{{ lookup('file', './public_keys/{{ item }}.pub') }}"
+      loop: "{{ users }}"
+
+
+
+
